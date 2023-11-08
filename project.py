@@ -3,5 +3,46 @@
     Jason Candila, Kumail Jafari, June Lee,  Shalom Akpakla
 """
 
+"""
+    Jason
+"""
 
+
+
+
+
+
+
+
+
+
+
+
+"""
+    June
+"""
+
+
+
+
+
+
+
+
+
+
+"""
+    Kumalai
+"""
+
+
+
+
+
+
+
+
+"""
+    Shalom
+"""
 
