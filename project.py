@@ -1,6 +1,6 @@
 """
     Project code of the Spotify Karaoke
-    Jason Candila,
+    Jason Candila, Kumail Jafari
 """
 
 
