@@ -4,7 +4,7 @@
 """
 
 """
-    Jason
+    Jason: Class that holds the song information
 """
 
 
@@ -32,7 +32,7 @@
 
 
 """
-    Kumail
+    Kumail: Basic if main, and parse_args
 """
 
 
@@ -43,6 +43,6 @@
 
 
 """
-    Shalom
+    Shalom: Input User Info Function
 """
 
