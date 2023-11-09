@@ -10,7 +10,13 @@ Class: Song()
 """
     Jason
 """
-
+class Song:
+    def __init__(self, artist, title, lyrics, songfile):
+        self.artist = artist
+        self.title = title
+        self.lyrics = lyrics
+        self.songfile = songfile
+    
 
 
 
