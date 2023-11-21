@@ -42,15 +42,20 @@ class Song:
 
 
 """
-    Kumail: Basic if main, and parse_args
+    Kumail: if main, and parse_args
 """
+from argparse import ArgumentParser
+import sys
 
+#will be finished once we determine amount of arguments
+def parse_args(args_list):
+    parser = ArgumentParser()
+    #parser.add_argument() - Need to add arguments
+    return parser.parse_args(args_list)
 
-
-
-
-
-
+if __name__ == "__main__":
+    args = parse_args(sys.argv[1:])
+    #call functions
 
 """
     Shalom: Input User Info Function
