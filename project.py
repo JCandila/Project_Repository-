@@ -146,4 +146,13 @@ if __name__ == "__main__":
 """
     Shalom: Input User Info Function
 """
+def play_song(song):
+    lines = song.lyrics.split("\n")
+    for line in lines:
+        words = line.split(' ')
+        for word in words:
+            print('\x1b[6;30;42m' + word + '\x1b[0m')
+            time.sleep(0.15)
 
+def add_to_queue(song):
+    pass
