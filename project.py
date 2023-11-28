@@ -4,6 +4,7 @@ import sys
 import json
 import time
 import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 import lyricsgenius as lg
 """
     Project code of the Spotify Karaoke
@@ -74,16 +75,13 @@ def spot_ap(artist_name, song_title):
 """
     June: allows user input and checks if the song exists
 """
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-
 def get_spotify_song():
     # Set up your Spotify API credentials
-    client_id = 'client_id_#'
-    client_secret = 'client_secret_#'
+    #client_id = 'client_id_#'
+    #client_secret = 'client_secret_#'
 
     # Set up Spotify API client
-    sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
+    #sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
 
     # Get user input for artist and song
     user_input = input("Enter artist name and song title separated by a comma (e.g., Artist Name, Song Title): ")
@@ -91,57 +89,29 @@ def get_spotify_song():
     # Split the user input into artist and song
     artist_name, song_title = map(str.strip, user_input.split(','))
 
-    # Use Spotify API to search for the song
-    results = sp.search(q=f"artist:{artist_name} track:{song_title}", type='track')
-
-    # Check if the user inputted song exists
-    if results['tracks']['items']:
-        # Get the first result (assuming it's the most relevant)
-        first_result = results['tracks']['items'][0]
-
-        # Extract relevant information
-        song_name = first_result['name']
-        artist_name = first_result['artists'][0]['name']
-        album_name = first_result['album']['name']
-        spotify_url = first_result['external_urls']['spotify']
-
-        # Print the information
-        print(f"\nSong: {song_name}\nArtist: {artist_name}\nAlbum: {album_name}\nSpotify URL: {spotify_url}")
-
-    else:
-        print("No results found for the inputted artist and song title.")
-
-# Call the function
-get_spotify_song()
-
-
-
-
-
-
-
+    return artist_name, song_title
 
 
 """
     Kumail: if main, and parse_args
 """
-def main(an, st):
+def main():
+    an, st = get_spotify_song()
     song_info = info(an, st, "", "")
-    
     print(spot_ap(song_info.artist, song_info.title))
     
 
-
+"""
 def parse_args(arglist):
     parser = ArgumentParser()
     parser.add_argument("artist_name", type = str, help="Name of the artist who made the song")
     parser.add_argument("song_title", type =str, help="The title of the song")
     return parser.parse_args(arglist)
-
+"""
 
 if __name__ == "__main__":
-    args = parse_args(sys.argv[1:])
-    main(args.artist_name, args.song_title)
+    #args = parse_args(sys.argv[1:])
+    main()
 
 """
     Shalom: Input User Info Function
