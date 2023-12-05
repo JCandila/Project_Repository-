@@ -16,7 +16,7 @@ Class: Song()
 
 """
 """
-    Jason
+    Jason: Song info class, spotify api + genius connection
 """
 class info:
     def __init__(self, artist, title, lyrics, songfile):
@@ -61,7 +61,7 @@ def spot_ap(artist_name, song_title):
     '''
     song = genius.search_song(title=song_title, artist=artist_name)
     lyrics = song.lyrics
-    print(lyrics)
+    return lyrics
 
 
 
@@ -91,14 +91,29 @@ def get_spotify_song():
 
     return artist_name, song_title
 
+"""
+    Shalom: Song playing GUI
+"""
+def play_song(song):
+    lines = song.lyrics.split("\n")
+    for line in lines:
+        words = line.split(' ')
+        for word in words:
+            print('\x1b[6;30;42m' + word + '\x1b[0m')
+            time.sleep(0.15)
+
+def add_to_queue(song):
+    pass
 
 """
     Kumail: if main, and parse_args
 """
 def main():
     an, st = get_spotify_song()
-    song_info = info(an, st, "", "")
-    print(spot_ap(song_info.artist, song_info.title))
+    lyrics = spot_ap(an, st)
+    songInfo = info(an, st, lyrics, "")
+    play_song(songInfo)
+    
     
 
 """
@@ -113,16 +128,3 @@ if __name__ == "__main__":
     #args = parse_args(sys.argv[1:])
     main()
 
-"""
-    Shalom: Input User Info Function
-"""
-def play_song(song):
-    lines = song.lyrics.split("\n")
-    for line in lines:
-        words = line.split(' ')
-        for word in words:
-            print('\x1b[6;30;42m' + word + '\x1b[0m')
-            time.sleep(0.15)
-
-def add_to_queue(song):
-    pass
