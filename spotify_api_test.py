@@ -1,5 +1,7 @@
 import os
+import base64
 from argparse import ArgumentParser
+from requests import post, get
 import sys
 import json
 import time
@@ -36,18 +38,33 @@ def spot_ap(artist_name, song_title):
 
     spotify_object = spotipy.Spotify(auth=token)
 
+
     genius = lg.Genius(genius_access_token)
 
     current = spotify_object.currently_playing()
     print(json.dumps(current, sort_keys=False, indent=4))
 
-    '''
-    artist_name = current['item']['album']['artists'][0]['name']
-    song_title = current['item']['name']
-    '''
+    auth_header = {"Authorization": "Bearer " + token}
+    
+    
+    
+    url = "https://api.spotify.com/v1/search"
+    query = f"?q={artist_name, song_title}&type=artist,track&limit=1"
+    
+    query_url = url + query
+    result = get(query_url, headers=auth_header)  
+    json_result = json.loads(result.content)
+    print(json.dumps(json_result, sort_keys=False, indent=1))
+    
+    image = json_result["artists"]["items"][0]["items"][0]["item"]["album"]["images"][1]["url"]
+    duration = json_result["artists"]["items"][0]["artists"]["item"]["album"]["duration_ms"]
+    
+    print(f"Image URL: " + {image})
+    print(f"Duration of Song: " + {duration})
+    
     song = genius.search_song(title=song_title, artist=artist_name)
     lyrics = song.lyrics
-    print(lyrics)
+
 
 """
 while True:
