@@ -7,7 +7,11 @@ import json
 import time
 import spotipy
 import lyricsgenius as lg
-
+import io
+if sys.version_info < (3, 0):
+    from urllib2 import urlopen
+else:
+    from urllib.request import urlopen
 from spotipy.oauth2 import SpotifyClientCredentials
 import lyricsgenius as lg
 import tkinter as tk
@@ -31,18 +35,38 @@ Class: Song()
     Jason: Song info class, spotify api + genius connection
 """
 class info:
-    def __init__(self, artist, title, lyrics, songfile):
+    def __init__(self, artist, title, lyrics, image, duration):
         self.artist = artist
         self.title = title
         self.lyrics = lyrics
-        self.songfile = songfile
+        self.image = image
+        self.duration = duration
     
+    
+def gui_info(lyrics, image, duration):
+    #raw_lyrics = open("/Users/shalomakpakla/Documents/INST326_exercises/heartless.txt", "r")
+    song = lyrics.split("\n")
+    total_lines = len(song)
+    fd = urlopen(image)
+    file_path = io.BytesIO(fd.read())
+    color_thief = ColorThief(file_path)
+    # get the dominant color
+    dominant_color = color_thief.get_color(quality=1)
+    #convert rgb to hex
+    def rgb_to_hex(r, g, b):
+        return '#{:02x}{:02x}{:02x}'.format(r, g, b)
+    background_fill =(rgb_to_hex(dominant_color[0],dominant_color[1],dominant_color[2]))
+    refresh_rate = int(math.floor(duration/(len(song)/2))) 
+    return song, total_lines, background_fill, refresh_rate, file_path
     
 class Karaoke(tk.Tk):
     line = 0
-    def __init__(self):
+    def __init__(self, song, duration, total_lines, background_fill, refresh_rate, file_path):
         super().__init__()
-
+        self.song = song
+        self.refresh_rate = refresh_rate
+        self.total_lines = total_lines
+        
         # configure the root window
         self.title('Karoake')
         self.resizable(True, True)
@@ -50,7 +74,7 @@ class Karaoke(tk.Tk):
         self['bg'] = f'{background_fill}'
 
         #album art
-        img = Image.open("/Users/shalomakpakla/Documents/INST326_exercises/graduation_cover.jpeg") 
+        img = Image.open(file_path) 
         img = img.resize((350,350)) 
         img = ImageTk.PhotoImage(img)
         picture = tk.Label(self, image = img)
@@ -64,26 +88,18 @@ class Karaoke(tk.Tk):
         bar.pack(pady = 10)
         bar.step(1)
         bar.start(1000)
-        
-        #updates progress bar 
-        def start(self):
-            play_time = 0
-            while(play_time < duration):
-                time.sleep(1)
-                bar["value"] += 1
-                play_time += 1 
-                bar.update_idletasks()
        
         # change the background color to black
         self.style = ttk.Style(self)
         self.style.configure(
             'TLabel',
-            background='red',
+            background='black',
             foreground='white')
 
         # Lyrics text
         self.label = ttk.Label(
             self,
+            background = "black",
             text = self.song_line(),
             font=('futura', 40))
         self.label.pack(expand=True)
@@ -92,15 +108,15 @@ class Karaoke(tk.Tk):
         self.label.after(refresh_rate, self.update)
     
     def song_line(self):
-        if self.line < total_lines or self.line %2 == 0 and self.line == total_lines:
+        if self.line < self.total_lines or self.line %2 == 0 and self.line == self.total_lines:
             self.line += 2
             two_bar = ""
             #return song[self.line - 2 : self.line]
-            for bar in song[self.line - 2 : self.line]:
+            for bar in self.song[self.line - 2 : self.line]:
                 two_bar += bar + '\n'
             return two_bar
-        if self.line != "\n" and self.line == total_lines:
-                return song[self.line-2]
+        if self.line != "\n" and self.line == self.total_lines:
+                return self.song[self.line-2]
     
     def update(self):
         """ update the label every 6 seconds """
@@ -108,7 +124,7 @@ class Karaoke(tk.Tk):
         self.label.configure(text=self.song_line())
 
         # schedule another timer
-        self.label.after(refresh_rate, self.update)
+        self.label.after(self.refresh_rate, self.update)
         
 
 def spot_ap(artist_name, song_title):
@@ -149,8 +165,7 @@ def spot_ap(artist_name, song_title):
     query_url = url + query
     result = get(query_url, headers=auth_header)  
     json_result = json.loads(result.content)
-    print(json.dumps(json_result, sort_keys=False, indent=5))
-    
+
     image = json_result["tracks"]["items"][0]["album"]["images"][1]["url"]
     duration = json_result["tracks"]["items"][0]["duration_ms"]
     
@@ -199,10 +214,12 @@ def add_to_queue(song):
 def main():
     an, st = get_spotify_song()
     lyrics, image, duration = spot_ap(an, st)
-    
-    songInfo = info(an, st, lyrics, "")
-    play_song(songInfo)
-    
+    songInfo = info(an, st, lyrics, image, duration)
+    song, total_lines, background_fill, refresh_rate, file_path = gui_info(songInfo.lyrics, songInfo.image, songInfo.duration)
+    print("A new Karaoke tab has opened")
+    GUI = Karaoke(song, songInfo.duration, total_lines, background_fill, refresh_rate, file_path)
+    GUI.mainloop()
+   
     
 
 """
@@ -216,17 +233,4 @@ def parse_args(arglist):
 if __name__ == "__main__":
     #args = parse_args(sys.argv[1:])
     main()
-
-"""
-    Shalom: Input User Info Function
-"""
-def play_song(song):
-    lines = song.lyrics.split("\n")
-    for line in lines:
-        words = line.split(' ')
-        for word in words:
-            print('\x1b[6;30;42m' + word + '\x1b[0m')
-            time.sleep(0.15)
-
-def add_to_queue(song):
-    pass
+    
