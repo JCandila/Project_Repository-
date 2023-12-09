@@ -54,7 +54,7 @@ def spot_ap(artist_name, song_title):
     query_url = url + query
     result = get(query_url, headers=auth_header)  
     json_result = json.loads(result.content)
-    print(json.dumps(json_result, sort_keys=False, indent=1))
+    print(json.dumps(json_result, sort_keys=False, indent=5))
     
     image = json_result["artists"]["items"][0]["items"][0]["item"]["album"]["images"][1]["url"]
     duration = json_result["artists"]["items"][0]["artists"]["item"]["album"]["duration_ms"]
