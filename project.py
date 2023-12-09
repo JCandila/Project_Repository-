@@ -22,6 +22,8 @@ import colorthief as ct
 from PIL import ImageTk, Image
 from colorthief import ColorThief
 import math
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 """
     Project code of the Spotify Karaoke
     Jason Candila, Kumail Jafari, June Lee, Shalom Akpakla
@@ -168,6 +170,8 @@ def spot_ap(artist_name, song_title):
 
     image = json_result["tracks"]["items"][0]["album"]["images"][1]["url"]
     duration = json_result["tracks"]["items"][0]["duration_ms"]
+    print(image)
+    print(duration)
     
     song = genius.search_song(title=song_title, artist=artist_name)
     lyrics = song.lyrics
