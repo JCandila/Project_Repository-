@@ -56,48 +56,15 @@ def spot_ap(artist_name, song_title):
     json_result = json.loads(result.content)
     print(json.dumps(json_result, sort_keys=False, indent=5))
     
-    image = json_result["artists"]["items"][0]["items"][0]["item"]["album"]["images"][1]["url"]
-    duration = json_result["artists"]["items"][0]["artists"]["item"]["album"]["duration_ms"]
+    image = json_result["tracks"]["items"][0]["album"]["images"][1]["url"]
+    duration = json_result["tracks"]["items"][0]["duration_ms"]
     
-    print(f"Image URL: " + {image})
-    print(f"Duration of Song: " + {duration})
+    print(f"{image}")
+    print(f"{duration}")
     
     song = genius.search_song(title=song_title, artist=artist_name)
     lyrics = song.lyrics
 
-
-"""
-while True:
-    current = spotify_object.currently_playing()
-    status = current['currently_playing_type']
-    
-    if status == 'track':
-        artist_name = current['item']['album']['artists'][0]['name']
-        song_title = current['item']['name']
-        length = current['item']['duration_ms']
-        progress = current['progress_ms']
-        time_left = int(((length-progress)/1000))
-        
-        song = genius.search_song(title=song_title, artist=artist_name)
-        lyrics = song.lyrics
-        print(lyrics)
-        
-        time.sleep(time_left)
-        
-    elif status == 'ad':
-        time.sleep(30)
-"""
-"""
-Client ID
-59b86ae6790f4754949194665425d882
-Client secret
-8b25728b46ed4756b75698e8b71b4e88
-Genius Access Token
-Lpt-Wapnelbf2wGB7pGd_WEitsimXTYCtkNFE5NTB-dl451svFCQax4zmR1TV8qL
-Spotify Access Token:
-BQCELDO8mj0yJbK1Y36_Au9sFOnu2r-3JCAVDDgGHeJ3Z9zwBYDcLLxGvF2wvpySLr_1kNEYRijxTCxig7cjAnHHrh9f6pFnlfc7Km1oSd0rz5ypromzWAuz4xRWv5ugNvRSSVcGX_emwxiOqwwwxV0Zh1TPYalb2Yr_ReBwIks0Dh2ZLcMQxII
-"""
-""" uri https://google.com"""
 
 def main(an, st):
     song_info = info(an, st)

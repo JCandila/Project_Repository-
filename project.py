@@ -1,9 +1,12 @@
 import os
+import base64
 from argparse import ArgumentParser
+from requests import post, get
 import sys
 import json
 import time
 import spotipy
+import lyricsgenius as lg
 
 from spotipy.oauth2 import SpotifyClientCredentials
 import lyricsgenius as lg
@@ -138,22 +141,24 @@ def spot_ap(artist_name, song_title):
     current = spotify_object.currently_playing()
     print(json.dumps(current, sort_keys=False, indent=4))
 
-    '''
-    artist_name = current['item']['album']['artists'][0]['name']
-    song_title = current['item']['name']
-    '''
+    auth_header = {"Authorization": "Bearer " + token}
+    
+    url = "https://api.spotify.com/v1/search"
+    query = f"?q={artist_name, song_title}&type=artist,track&limit=1"
+    
+    query_url = url + query
+    result = get(query_url, headers=auth_header)  
+    json_result = json.loads(result.content)
+    print(json.dumps(json_result, sort_keys=False, indent=5))
+    
+    image = json_result["tracks"]["items"][0]["album"]["images"][1]["url"]
+    duration = json_result["tracks"]["items"][0]["duration_ms"]
+    
     song = genius.search_song(title=song_title, artist=artist_name)
     lyrics = song.lyrics
-    return lyrics
-
-
-
-
-
-
-
-
-
+    
+    
+    return lyrics, image, duration
 
 """
     June: allows user input and checks if the song exists
@@ -193,7 +198,8 @@ def add_to_queue(song):
 """
 def main():
     an, st = get_spotify_song()
-    lyrics = spot_ap(an, st)
+    lyrics, image, duration = spot_ap(an, st)
+    
     songInfo = info(an, st, lyrics, "")
     play_song(songInfo)
     
