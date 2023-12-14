@@ -236,6 +236,10 @@ def get_spotify_song():
     Kumail: main function structure
 """
 def main():
+    """
+    This main function serves the purpose of bringing the entire program together. It starts by welcoming the user, then retrieves all of the
+    information for the spotify song, and lastly lets the user know that there is a new tab opened for the Karaoke visual.
+    """
     print("Welcome to Spotify Karaoke!")
     an, st = get_spotify_song()
     lyrics, image, duration = spot_api(an, st)
