@@ -28,15 +28,14 @@ ssl._create_default_https_context = ssl._create_unverified_context
     Project code of the Spotify Karaoke
     Jason Candila, Kumail Jafari, June Lee, Shalom Akpakla
 """
-"""
-Class: Song()
-    def _init_(artist, title, lyrics, songfile)
 
 """
-"""
-    Jason: Song info class, spotify api + genius connection
+    Jason: Song info class
 """
 class info:
+    """
+        info class is only meant to hold the user's song choice information
+    """
     def __init__(self, artist, title, lyrics, image, duration):
         self.artist = artist
         self.title = title
@@ -128,8 +127,22 @@ class Karaoke(tk.Tk):
         # schedule another timer
         self.label.after(self.refresh_rate, self.update)
         
-
-def spot_ap(artist_name, song_title):
+"""
+    Jason: Spotify and GENIUS API Function
+"""
+def spot_api(artist_name, song_title):
+    """
+        This function utilizes the Spotify and GENIUS api to return 
+        the url image of the inputted song's album cover as well as
+        the song's duration in milliseconds.
+        
+        Several terminal values are created, these variables are important
+        for accessing the user's spotify library to obtain information from.
+        For the project, we are using Jason's client id and client secret for
+        the project since it is associated with access to the API website.
+        Jason's GENIUS access token is also unique to the account associated
+        with the API website
+    """
     os.environ['SPOTIPY_CLIENT_ID'] = "59b86ae6790f4754949194665425d882"
     os.environ['SPOTIPY_CLIENT_SECRET'] = "8b25728b46ed4756b75698e8b71b4e88"
     os.environ['SPOTIPY_REDIRECT_URI'] = "https://google.com"
@@ -142,55 +155,76 @@ def spot_ap(artist_name, song_title):
 
     scopes = 'user-read-currently-playing'
 
+    #Creation of oauth_object allows us in the future to obtain a spotify access token
     oauth_object = spotipy.SpotifyOAuth(client_id=spotify_client_id,
                                         client_secret=spotify_secret,
                                         redirect_uri=spotify_redirect_uri,
                                         scope=scopes)
 
-    print(oauth_object)
-
+    #Starting in the form of a dictionary, we obtain the token for authorized user access
     token_dict = oauth_object.get_access_token()
     token = token_dict['access_token']
 
-    spotify_object = spotipy.Spotify(auth=token)
-
+    #The genius API object has been created for searching future information
     genius = lg.Genius(genius_access_token)
 
-    current = spotify_object.currently_playing()
-    print(json.dumps(current, sort_keys=False, indent=4))
-
+    #An authentication header is made, needs token obtained earlier from oauth_object
     auth_header = {"Authorization": "Bearer " + token}
     
+    """
+        url: The API's Search url to be used to search certain types of objects the API uses
+        query: Using the information inputted, we make a search query that uses the artist name
+            and track name. 'limit=1' allows for only the most popular search to appear for the user
+    """
     url = "https://api.spotify.com/v1/search"
     query = f"?q={artist_name, song_title}&type=artist,track&limit=1"
     
+    """
+        query_url: Combined url and query variables into one url string
+        result: Object that represents the API's information on the searched query, 
+            utilizes the auth_header for access
+        json_result: API's information converted into a usable dictionary, to be used later
+            for obtaining information the Spotify API provides 
+    """
     query_url = url + query
     result = get(query_url, headers=auth_header)  
     json_result = json.loads(result.content)
 
+    #Raised ValueError case for incorrectly inputted information
+    if len(json_result) == 0:
+        raise ValueError("There are no artists or songs with the inputted names")
+        
+    """
+        image: The URL of the album cover image, obtained with the Spotify's API
+            dictionary key pathing
+        duration: The duration of a song in milliseconds, obtained with the Spotify's API
+            dictionary key pathing
+    """
     image = json_result["tracks"]["items"][0]["album"]["images"][1]["url"]
     duration = json_result["tracks"]["items"][0]["duration_ms"]
-    print(image)
-    print(duration)
-    
+    """
+        song: A class object created by the GENIUS API's search_song function.
+            The arguments used are the information inputted into the spot_api
+            function.
+        lyrics: The lyrics from the song class created beforehand
+        
+        A ValueError case has been created for cases where there is no GENIUS
+        information on the inputted song.
+    """
     song = genius.search_song(title=song_title, artist=artist_name)
+    if song == None:
+        raise ValueError("The song inputted as no GENIUS lyrics")
     lyrics = song.lyrics
     
     
     return lyrics, image, duration
 
 """
-    June: allows user input and checks if the song exists
+    June: Function for user input
 """
 def get_spotify_song():
-    # Set up your Spotify API credentials
-    #client_id = 'client_id_#'
-    #client_secret = 'client_secret_#'
-
-    # Set up Spotify API client
-    #sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
-
     # Get user input for artist and song
+    print("INSTRUCTIONS:")
     user_input = input("Enter artist name and song title separated by a comma (e.g., Artist Name, Song Title): ")
 
     # Split the user input into artist and song
@@ -199,28 +233,23 @@ def get_spotify_song():
     return artist_name, song_title
 
 """
-    Kumail: if main, and parse_args
+    Kumail: main function structure
 """
 def main():
+    """
+    This main function serves the purpose of bringing the entire program together. It starts by welcoming the user, then retrieves all of the
+    information for the spotify song, and lastly lets the user know that there is a new tab opened for the Karaoke visual.
+    """
+    print("Welcome to Spotify Karaoke!")
     an, st = get_spotify_song()
-    lyrics, image, duration = spot_ap(an, st)
+    lyrics, image, duration = spot_api(an, st)
     songInfo = info(an, st, lyrics, image, duration)
     song, total_lines, background_fill, refresh_rate, file_path = gui_info(songInfo.lyrics, songInfo.image, songInfo.duration)
     print("A new Karaoke tab has opened")
     GUI = Karaoke(song, songInfo.duration, total_lines, background_fill, refresh_rate, file_path)
     GUI.mainloop()
-   
-    
 
-"""
-def parse_args(arglist):
-    parser = ArgumentParser()
-    parser.add_argument("artist_name", type = str, help="Name of the artist who made the song")
-    parser.add_argument("song_title", type =str, help="The title of the song")
-    return parser.parse_args(arglist)
-"""
 
 if __name__ == "__main__":
-    #args = parse_args(sys.argv[1:])
     main()
     
