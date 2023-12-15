@@ -25,6 +25,7 @@ import math
 import ssl
 
 from project import spot_api
+from project import get_spotify_song
 import unittest
 
 class TestSA(unittest.TestCase):
@@ -39,5 +40,18 @@ class TestSA(unittest.TestCase):
         #Testing the raised errors that occur if bad inputs are made
         self.assertRaises(IndexError, spot_api, "9r3902r", "3489fe2h")
         self.assertRaises(ValueError, spot_api, "hehethis should fail", "momoooooo")
+
+    
+    def test_get_spotify_song(self):
+        """
+        This test file checks if the function correctly extracts the artist name and song title from valid input.
+        """      
+        # Test with valid input
+        user_input = "Cutting Crew, (I Just) Died In Your Arms"
+        with unittest.mock.patch('builtins.input', return_value=user_input):
+            artist, title = get_spotify_song()
+
+        assert artist == "Cutting Crew"
+        assert title == "(I Just) Died In Your Arms"
         
         
