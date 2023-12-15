@@ -235,6 +235,10 @@ def spot_api(artist_name, song_title):
     June: Function for user input
 """
 def get_spotify_song():
+    """
+    This function prompts the user for to input an artist name and song title.
+    The inputed name and title is then stored in variables to later be accessed.
+    """
     # Get user input for artist and song
     print("INSTRUCTIONS:")
     user_input = input("Enter artist name and song title separated by a comma (e.g., Artist Name, Song Title): ")
