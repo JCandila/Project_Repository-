@@ -59,8 +59,15 @@ def gui_info(lyrics, image, duration):
     background_fill =(rgb_to_hex(dominant_color[0],dominant_color[1],dominant_color[2]))
     refresh_rate = int(math.floor(duration/(len(song)/2))) 
     return song, total_lines, background_fill, refresh_rate, file_path
-    
+"""
+Shalom GUI and other utilities
+"""    
 class Karaoke(tk.Tk):
+    """
+    Creates a Karaoke window with 350x350 pixel version of album cover, 
+    background color will be that of the dominant color on the cover, and lyrics will be printed out 2 lines at a
+    time at constant interval.
+    """
     line = 0
     def __init__(self, song, duration, total_lines, background_fill, refresh_rate, file_path):
         super().__init__()
@@ -68,10 +75,11 @@ class Karaoke(tk.Tk):
         self.refresh_rate = refresh_rate
         self.total_lines = total_lines
         
-        # configure the root window
+        # configure the Karaoke window
         self.title('Karoake')
         self.resizable(True, True)
         self.geometry('1500x750')
+        # change the background color to dominant color of album cover
         self['bg'] = f'{background_fill}'
 
         #album art
@@ -90,7 +98,7 @@ class Karaoke(tk.Tk):
         bar.step(1)
         bar.start(1000)
        
-        # change the background color to black
+        #style of lyrics(words)
         self.style = ttk.Style(self)
         self.style.configure(
             'TLabel',
@@ -105,10 +113,14 @@ class Karaoke(tk.Tk):
             font=('futura', 40))
         self.label.pack(expand=True)
 
-        # schedule an update for text every 6 second
+        # schedule an update for text every x seconds (x= refresh rate)
         self.label.after(refresh_rate, self.update)
     
     def song_line(self):
+        """
+        Displays Lyrics on GUI, two lines at a time
+        Returns: Two lines of lyrics, unless there is only one line left
+        """
         if self.line < self.total_lines or self.line %2 == 0 and self.line == self.total_lines:
             self.line += 2
             two_bar = ""
@@ -120,7 +132,7 @@ class Karaoke(tk.Tk):
                 return self.song[self.line-2]
     
     def update(self):
-        """ update the label every 6 seconds """
+        """ Updates the lyrics at a predetermined interval based on song duration """
 
         self.label.configure(text=self.song_line())
 
